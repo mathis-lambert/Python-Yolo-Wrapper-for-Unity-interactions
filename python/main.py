@@ -36,7 +36,7 @@ class main():
         if args.source == "cam":
             self.cap = cv2.VideoCapture(0)
         elif args.source == "video":
-            self.video = cv2.VideoCapture("./vid2.mov")
+            self.video = cv2.VideoCapture(args.video)
 
         self.yolo = Yolo(args.model)
 
@@ -56,9 +56,10 @@ class main():
             # Run detection and parse results
             r, f = self.yolo.runDetection(
                 frame, mode=args.detect_method, tracker=args.tracker)
-            data = self.yolo.parseResults(r)
+            # Get data from results
+            d = self.yolo.parseResults(r)
 
-            self.sock.SendData(str(data))  # send data
+            self.sock.SendData(self.yolo.getJsonData(d))  # send data
             print("Data sent")
 
             if SHOW_VIDEO:
@@ -73,5 +74,4 @@ class main():
 
 
 if __name__ == "__main__":
-    m = main()
-    m.start()
+    main().start()

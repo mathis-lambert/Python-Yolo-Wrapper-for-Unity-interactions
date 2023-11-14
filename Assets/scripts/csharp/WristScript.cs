@@ -35,8 +35,5 @@ public class WristScript : MonoBehaviour
         // Set the position of the left and right wrist
         leftWrist.transform.position = new Vector3(width - leftWristPos.x, leftWristPos.y + height, leftWristPos.z) * localScale;
         rightWrist.transform.position = new Vector3(width - rightWristPos.x, rightWristPos.y + height, rightWristPos.z) * localScale;
-
-        print("left wrist: " + leftWrist.transform.position.ToString());
-        print("right wrist: " + rightWrist.transform.position.ToString());
     }
 }

@@ -8,7 +8,7 @@ class Yolo:
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
-        self.confidence = 0.75
+        self.confidence = 0.5  # Confidence threshold
 
     def runDetection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml"):
         """
@@ -31,6 +31,8 @@ class Yolo:
         """
         Parse predictions into a list of dictionaries
         """
+        boxes = results[0].boxes.xyxy.tolist()
+        print(boxes)
         keypoints = results[0].keypoints.xy.tolist()
         keypoints_normalized = results[0].keypoints.xyn.tolist()
 

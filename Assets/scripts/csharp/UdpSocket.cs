@@ -95,6 +95,7 @@ public class UdpSocket : MonoBehaviour
                 var obj = JSON.Parse(text);
 
                 // get hands distance
+                obj = obj.AsArray;
                 handsDistance = obj[0]["hands_distance"];
 
                 // get left and right wrist positions

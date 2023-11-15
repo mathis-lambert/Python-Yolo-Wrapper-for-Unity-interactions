@@ -1,14 +1,16 @@
+from torch import device
 from ultralytics import YOLO
 import json
 from utils import *
 
 
 class Yolo:
-    def __init__(self, path, conf=0.5):
+    def __init__(self, path, conf=0.5, gpu=False):
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
         self.confidence = conf  # Confidence threshold
+        self.device = device("cuda:0" if gpu else "cpu")
 
     def runDetection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml"):
         """
@@ -16,10 +18,11 @@ class Yolo:
         """
         # Prédire les poses
         if mode == "predict":
-            results = self.model(frame, conf=self.confidence)
+            results = self.model(
+                frame, conf=self.confidence, device=self.device)
         elif mode == "track":
             results = self.model.track(
-                frame, tracker=tracker, persist=True, conf=self.confidence)
+                frame, tracker=tracker, persist=True, conf=self.confidence, device=self.device)
         else:
             raise Exception("Mode must be 'predict' or 'track'")
 

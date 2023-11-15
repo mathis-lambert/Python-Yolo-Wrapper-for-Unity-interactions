@@ -14,6 +14,10 @@ parser.add_argument("--detect-method", type=str, default="predict", choices=[
                     "predict", "track"], help="detection method, predict or track")
 parser.add_argument("--tracker", type=str, default="./trackers/botsort.yaml",
                     help="tracker path if detect method is track")
+parser.add_argument("--confidence", type=float, default=0.5,
+                    help="confidence threshold, default is 0.5")
+parser.add_argument("--gpu", action="store_true",
+                    help="use gpu for detection")
 args = parser.parse_args()
 
 SHOW_VIDEO = args.show
@@ -36,7 +40,7 @@ class main():
             pass
         self.cap = cv2.VideoCapture(args.source)
 
-        self.yolo = Yolo(args.model, 0.3)
+        self.yolo = Yolo(args.model, conf=args.confidence, gpu=args.gpu)
 
     def start(self):
         """
@@ -47,6 +51,8 @@ class main():
             ret, frame = self.cap.read()
             if not ret:
                 break
+
+            frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
             # Run detection and parse results
             r, f = self.yolo.runDetection(

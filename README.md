@@ -27,10 +27,10 @@ Open a terminal and init the project with these commands :
 ```bash
 cd python
 source venv/bin/activate
-python main.py --source 0 # To use your webcam
-python main.py --source path/to/video # To use a video
-python main.py --source 0 --show # To show the video
-python main.py --help # To see all the options
+python ./src/main.py --source 0 # To use your webcam
+python ./src/main.py --source path/to/video # To use a video
+python ./src/main.py --source 0 --show # To show the video
+python ./src/main.py --help # To see all the options
 ```
 
 ## Collaborate

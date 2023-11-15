@@ -21,7 +21,7 @@ pip install -r requirements.txt # install the dependencies
 
 ## Usage
 ### Unity
-Open the project with `Unity **2022.3.13f1**` or later. You can find the project in the folder `UnityProject/`.
+Open the project with **Unity `2022.3.13f1`** or later. You can find the project in the folder `UnityProject/`.
 
 ### Python
 #### Execute the project

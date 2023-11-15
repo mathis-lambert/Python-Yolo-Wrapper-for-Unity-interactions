@@ -1,0 +1,6 @@
+venv/
+.vscode/
+*.mov
+*.pt
+/python/*.meta
+__pycache__/

@@ -1,9 +1,4 @@
-venv/
-.vscode/
-*.mov
-*.pt
-/python/*.meta
-__pycache__/
+
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/main/Unity.gitignore

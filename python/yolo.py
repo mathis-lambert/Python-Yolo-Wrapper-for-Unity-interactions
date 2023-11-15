@@ -4,11 +4,11 @@ from utils import *
 
 
 class Yolo:
-    def __init__(self, path):
+    def __init__(self, path, conf=0.5):
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
-        self.confidence = 0.5  # Confidence threshold
+        self.confidence = conf  # Confidence threshold
 
     def runDetection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml"):
         """

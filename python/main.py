@@ -8,9 +8,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--show", action="store_true", help="show video")
 parser.add_argument("--source", type=str, default="cam",
                     help="cam or video", required=True)
-parser.add_argument("--video", type=str, default="./vid2.mov",
+parser.add_argument("--path", type=str, default="./vid2.mov",
                     help="video path if source is video")
-parser.add_argument("--model", type=str, default="yolov8s-pose.pt",
+parser.add_argument("--model", type=str, default="./models/yolov8s-pose.pt",
                     help="model path, default is yolov8s-pose.pt")
 parser.add_argument("--detect-method", type=str, default="predict", choices=[
                     "predict", "track"], help="detection method, predict or track")
@@ -36,9 +36,9 @@ class main():
         if args.source == "cam":
             self.cap = cv2.VideoCapture(0)
         elif args.source == "video":
-            self.video = cv2.VideoCapture(args.video)
+            self.video = cv2.VideoCapture(args.path)
 
-        self.yolo = Yolo(args.model)
+        self.yolo = Yolo(args.model, 0.3)
 
     def start(self):
         """

@@ -6,12 +6,10 @@ import argparse
 # Parse arguments from command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--show", action="store_true", help="show video")
-parser.add_argument("--source", type=str, default="cam",
-                    help="cam or video", required=True)
-parser.add_argument("--path", type=str, default="./vid2.mov",
-                    help="video path if source is video")
-parser.add_argument("--model", type=str, default="./models/yolov8s-pose.pt",
-                    help="model path, default is yolov8s-pose.pt")
+parser.add_argument("--source", type=str, default="0",
+                    help="Your capture source, 0 for camera or /path/to/file for a video", required=True)
+parser.add_argument("--model", type=str, default="./models/yolov8n-pose.pt",
+                    help="model path, default is yolov8n-pose.pt")
 parser.add_argument("--detect-method", type=str, default="predict", choices=[
                     "predict", "track"], help="detection method, predict or track")
 parser.add_argument("--tracker", type=str, default="./trackers/botsort.yaml",
@@ -19,7 +17,6 @@ parser.add_argument("--tracker", type=str, default="./trackers/botsort.yaml",
 args = parser.parse_args()
 
 SHOW_VIDEO = args.show
-LIVE_STREAM = args.source == "cam"
 
 
 class main():
@@ -33,10 +30,11 @@ class main():
                       enableRX=True, suppressWarnings=True)
 
         # Create video capture object
-        if args.source == "cam":
-            self.cap = cv2.VideoCapture(0)
-        elif args.source == "video":
-            self.video = cv2.VideoCapture(args.path)
+        try:
+            args.source = int(args.source)
+        except:
+            pass
+        self.cap = cv2.VideoCapture(args.source)
 
         self.yolo = Yolo(args.model, 0.3)
 
@@ -46,12 +44,9 @@ class main():
         """
         while True:
             # Read frame from video capture object
-            if LIVE_STREAM:
-                ret, frame = self.cap.read()
-                if not ret:
-                    break
-            else:
-                frame = self.video.read()[1]
+            ret, frame = self.cap.read()
+            if not ret:
+                break
 
             # Run detection and parse results
             r, f = self.yolo.runDetection(

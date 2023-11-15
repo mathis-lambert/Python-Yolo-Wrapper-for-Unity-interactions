@@ -1,13 +1,13 @@
-from udpsocket import updsocket as s
+from src.udpsocket import updsocket as s
 import cv2
-from yolo import Yolo
+from src.yolo import Yolo
 import argparse
 
 # Parse arguments from command line
 parser = argparse.ArgumentParser()
 parser.add_argument("--show", action="store_true", help="show video")
 parser.add_argument("--source", type=str, default="0",
-                    help="Your capture source, 0 for camera or /path/to/file for a video", required=True)
+                    help="Your capture source, 0 for camera or /path/to/file for a video")
 parser.add_argument("--model", type=str, default="./models/yolov8n-pose.pt",
                     help="model path, default is yolov8n-pose.pt")
 parser.add_argument("--detect-method", type=str, default="predict", choices=[

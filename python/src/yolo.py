@@ -1,7 +1,7 @@
 from torch import device
 from ultralytics import YOLO
 import json
-from utils import *
+from src.utils import *
 
 
 class Yolo:

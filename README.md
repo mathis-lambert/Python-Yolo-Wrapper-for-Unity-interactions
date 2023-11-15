@@ -23,14 +23,22 @@ pip install -r requirements.txt
 Open the project with Unity 2022.3.13f1 or later. You can find the project in the folder `UnityProject/`.
 
 ### Python
+#### Execute the project
 Open a terminal and init the project with these commands :
 ```bash
 cd python
 source venv/bin/activate
-python ./src/main.py --source 0 # To use your webcam
-python ./src/main.py --source path/to/video # To use a video
-python ./src/main.py --source 0 --show # To show the video
-python ./src/main.py --help # To see all the options
+python -m src.main --source 0 # To use your webcam
+python -m src.main --source path/to/video # To use a video
+python -m src.main --source 0 --show # To show the video
+python -m src.main --help # To see all the options
+```
+#### Execute the tests
+Open a terminal and init the project with these commands :
+```bash
+cd python
+source venv/bin/activate
+python -m pytest -v
 ```
 
 ## Collaborate

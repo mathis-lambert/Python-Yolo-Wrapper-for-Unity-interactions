@@ -1,5 +1,5 @@
 import pytest
-from src.udpsocket import updsocket
+from pywui.udpsocket import updsocket
 from unittest.mock import MagicMock, patch
 
 

@@ -1,6 +1,6 @@
 import cv2
 import pytest
-from src.yolo import Yolo
+from pywui.yolo import Yolo
 
 
 @pytest.fixture

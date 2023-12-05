@@ -1,5 +1,5 @@
 import numpy as np
-from src.utils import *
+from pywui.utils import *
 
 
 def test_distance():

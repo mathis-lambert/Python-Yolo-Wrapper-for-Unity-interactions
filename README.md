@@ -27,30 +27,33 @@ Open the project with **Unity `2022.3.13f1`** or later. You can find the project
 ### Python
 #### Execute scripts
 Open a terminal and run these commands :
-This will run the script `scripts/main.py` with the --help option to show you the available options
+This will run the script `src/pywui/main.py` with the --help option to show you the available options
 ```bash
 cd python
 source venv/bin/activate
-python scripts/main.py --help
+pywui --help
 ```
 
 ##### Examples
 Use your webcam
 ```bash
-python scripts/main.py --source 0
+pywui --source 0
 ```
 
 Show the webcam output
 ```bash
-python scripts/main.py --source 0 --show
+pywui --source 0 --show
 ```
 
 Use video file
 ```bash
-python scripts/main.py --source path/to/video.mp4
+pywui --source path/to/video.mp4
 ```
 
-**You can find more examples in the `scripts/` folder**
+**NOTE: `pywui`only runs the script main.py, if you want to run a script from the `scripts/` folder, you have to use `python` instead of `pywui`**
+```bash 
+python scripts/the_script_you_want.py
+```
 
 #### Execute the tests
 Open a terminal and run these commands :

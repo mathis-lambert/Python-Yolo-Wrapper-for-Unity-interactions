@@ -35,8 +35,8 @@ setup(
         Path(__file__).parent / 'requirements.txt'),
     entry_points={
         'console_scripts': [
-            'pywui=scripts.main:main',  # Si votre fichier main.py contient une fonction main()
-            'pywui-test=pywui:test'         # Si vous souhaitez également l'ajouter ici
+            'pywui=pywui:main',
+            'pywui-test=pywui:test'
         ]
     },
 )

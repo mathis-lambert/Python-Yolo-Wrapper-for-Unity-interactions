@@ -1,7 +1,7 @@
 from torch import device
 from ultralytics import YOLO
 import json
-from src.utils import *
+from pywui.utils import *
 
 
 class Yolo:

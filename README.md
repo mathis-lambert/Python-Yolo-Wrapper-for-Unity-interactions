@@ -23,6 +23,8 @@ make install
 ## Usage
 ### Unity
 Open the project with **Unity `2022.3.13f1`** or later. You can find the project in the folder `UnityProject/`.
+- Click on the ADD button in the Unity Hub and select the folder `UnityProject/`
+- Select the project and click on the OPEN button
 
 ### Python
 #### Execute scripts

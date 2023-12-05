@@ -1,6 +1,6 @@
-from src.udpsocket import updsocket as s
+from pywui.udpsocket import updsocket as s
 import cv2
-from src.yolo import Yolo
+from pywui.yolo import Yolo
 import argparse
 
 # Parse arguments from command line

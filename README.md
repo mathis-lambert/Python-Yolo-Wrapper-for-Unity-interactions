@@ -12,11 +12,12 @@ cd yolo_with_unity
 *It's not a docker project for now, but it should be later...*
 
 init the project with these commands :
+this will create a virtual env and install the dependencies
 ```bash
 cd python
-python3 -m venv venv # create the virtual env (only the first time, it will handle the dependencies)
-source venv/bin/activate # activate the virtual env
-pip install -r requirements.txt # install the dependencies
+python3 -m venv venv
+source venv/bin/activate
+make install
 ```
 
 ## Usage
@@ -24,22 +25,39 @@ pip install -r requirements.txt # install the dependencies
 Open the project with **Unity `2022.3.13f1`** or later. You can find the project in the folder `UnityProject/`.
 
 ### Python
-#### Execute the project
-Open a terminal and init the project with these commands :
+#### Execute scripts
+Open a terminal and run these commands :
+This will run the script `scripts/main.py` with the --help option to show you the available options
 ```bash
 cd python
 source venv/bin/activate
-python -m src.main --source 0 # To use your webcam
-python -m src.main --source path/to/video # To use a video
-python -m src.main --source 0 --show # To show the video
-python -m src.main --help # To see all the options
+python scripts/main.py --help
 ```
+
+##### Examples
+Use your webcam
+```bash
+python scripts/main.py --source 0
+```
+
+Show the webcam output
+```bash
+python scripts/main.py --source 0 --show
+```
+
+Use video file
+```bash
+python scripts/main.py --source path/to/video.mp4
+```
+
+**You can find more examples in the `scripts/` folder**
+
 #### Execute the tests
-Open a terminal and init the project with these commands :
+Open a terminal and run these commands :
 ```bash
 cd python
 source venv/bin/activate
-python -m pytest -v
+pywui-test
 ```
 
 ## Collaborate

@@ -1,13 +1,17 @@
+import os
+import re
 from torch import device
 from ultralytics import YOLO
 import json
 from pywui.utils import *
 from scipy.signal import butter, lfilter
 import matplotlib.pyplot as plt
+from collections import defaultdict
+import time  # For time measurement
 
 
 class Yolo:
-    def __init__(self, path, conf=0.5, gpu=False, plot=False):
+    def __init__(self, path, conf=0.5, gpu=False, plot=False, plot_show=False, plot_save=False, debug=False, log=False, log_path="./logs/", filter=False, filter_order=3):
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
@@ -17,12 +21,20 @@ class Yolo:
         self.last_filtered_values = dict()
 
         self.plot = plot
+        self.plot_show = plot_show
+        self.plot_save = plot_save
         self.fig = None  # Initialize a figure attribute
         self.axes = None  # Initialize axes
 
-    def run_detection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml"):
+        self.debug = debug  # Debug mode
+        self.log = log  # Log data to txt file
+
+        self.filter = filter
+        self.filter_order = filter_order
+
+    def run_detection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml") -> tuple:
         """
-        Run detection on a frame
+        Run detection on a frame and return results and a plot
         """
         # Prédire les poses
         if mode == "predict":
@@ -82,51 +94,43 @@ class Yolo:
                 "right_ankle": person[16]
             }
 
-            # yolo_data = {
-            #     "left_arm_angle": round(angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
-            #     "right_arm_angle": round(angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
-            #     "left_shoulder_angle": round(angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
-            #     "right_shoulder_angle": round(angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
-            #     "head_inclination": get_head_inclination(positions),
-            #     "body_side": self.get_side(positions),
-            #     "hands_distance": self.distance(positions["left_wrist"], positions["right_wrist"]),
-            #     "positions": positions,
-            #     "positions_normalized": keypoints_normalized
-            # }
-
             if positions["left_wrist"] != [0, 0] or positions["right_wrist"] != [0, 0] and positions["nose"] != [0, 0]:
                 valid = True
             else:
                 valid = False
 
+            # Data is a dictionary of positions, if you want to add more data, add it here, it will be added to the list
+            # and then filtered
             data = {
                 "left_wrist": positions["left_wrist"],
                 "right_wrist": positions["right_wrist"],
                 "hands_distance": distance(positions["left_wrist"], positions["right_wrist"]),
                 "left_elbow_angle": angle(positions["left_wrist"], positions["left_elbow"], positions["left_shoulder"]),
                 "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"], positions["right_shoulder"]),
+                "left_arm_angle": round(angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
+                "right_arm_angle": round(angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
+                "left_shoulder_angle": round(angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
+                "right_shoulder_angle": round(angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
                 "is_valid": valid,
                 "id": id
             }
 
-            # Fill last_fives
-            ORDER = 5
+            # Fill last_values
             self.last_values[id].append(data)
 
-            # Filter
-            _fd = self.filter_signal(id, ORDER)
+            if self.filter:
+                ORDER = self.filter_order
+                # Filter
+                _fd = self.filter_signal(id, ORDER, verbose=True)
+                # Fill last_filtered_values if available
+                self.last_filtered_values[id].append(_fd) if _fd else None
+                # Append filtered data if available, else raw data to peoples list
+                self.peoples.append(_fd if _fd else data)
+            else:
+                self.peoples.append(data)
 
-            if _fd is not None:
-                print("raw",  self.last_values[id][-5])
-
-                print("filtered", _fd["left_elbow_angle"])
-                self.last_filtered_values[id].append(_fd)
-
-            self.peoples.append(data)
-
-        # TODO: REPRENDRE LA FONCTION PLOT_FILTERED_DATA
         if (self.plot):
-            self.plot_filtered_data()
+            self.plot_filtered_data(save=True)
 
         return self.peoples
 
@@ -134,78 +138,54 @@ class Yolo:
     def get_json_data(data):
         return json.dumps(data)
 
-    def filter_signal(self, id, order=5):
+    def filter_signal(self, id, order=5, verbose=False):
         """
-        Apply average filter on last values
+        Filter signal with a average filter
         """
-        print("Filtering data with order : ", order, " and id : ", id)
+        if verbose:
+            start_time = time.perf_counter()
+
+        print(f"Filtering data with order: {order} and id: {id}")
         if id is None:
             print("No id")
             return None
 
-        samples = [s for s in self.last_values[id]]
-        samples = samples[-order:]
-
-        if len(samples) < order:
-            print("Not enough data")
+        samples = self.last_values[id][-order:]
+        if len(samples) != order:
+            print("Insufficient data")
             return None
-        elif len(samples) > order:
-            raise Exception("Too much data in last_fives")
 
-        filtered_data = dict()
-        data = dict()
+        data = defaultdict(lambda: defaultdict(list))
+        single_values = defaultdict(list)
+        filtered_data = defaultdict(list)
 
         for sample in samples:
             for key, value in sample.items():
                 if key not in ["id", "is_valid"]:
-                    try:
-                        if data.get(key) is None:
-                            if isinstance(value, list):
-                                data[key] = dict()
-                                filtered_data[key] = dict()
-                                if len(value) == 2:
-                                    data[key]["x"] = list()
-                                    data[key]["y"] = list()
-                                    data[key]["x"].append(value[0])
-                                    data[key]["y"].append(value[1])
-                            else:
-                                data[key] = list()
-                                filtered_data[key] = list()
-                                data[key].append(value)
-                        else:
-                            if isinstance(value, list):
-                                if len(value) == 2:
-                                    data[key]["x"].append(value[0])
-                                    data[key]["y"].append(value[1])
+                    if isinstance(value, list) and len(value) == 2:
+                        data[key]['x'].append(value[0])
+                        data[key]['y'].append(value[1])
+                    else:
+                        single_values[key].append(value)
 
-                                else:
-                                    data[key].append(value)
+        for key, values in data.items():
+            filtered_data[key] = [sum(v) / len(v)
+                                  for v in values.values() if v]
 
-                    except Exception as e:
-                        print(e)
-                        continue
+        for key, values in single_values.items():
+            filtered_data[key] = sum(values) / len(values) if values else None
 
-        for key, value in data.items():
-            if isinstance(value, dict):
-                r = list()
-                for k, v in value.items():
-                    if len(v) == 0:
-                        continue
+        if verbose:
+            end_time = time.perf_counter()
+            duration = end_time - start_time
+            print(f"Filtering completed in {duration:.6f} seconds")
 
-                    r.append(sum(v) / len(v))
-
-                filtered_data[key] = r
-            else:
-                if len(value) == 0:
-                    continue
-                filtered_data[key] = sum(value) / len(value)
-
-        return filtered_data
+        return dict(filtered_data)
 
     def get_peoples(self):
         return self.peoples
 
-    def plot_filtered_data(self):
+    def plot_filtered_data(self, real_time=False, save=False):
         """
         Plot comparison graphs for each key in self.last_filtered_values/last_values
         to compare filtered values with raw values
@@ -232,7 +212,12 @@ class Yolo:
         fig_width = 10  # Adjust the width as needed
         fig_height = 2 * num_plots  # Adjust the height per subplot as needed
         if self.fig is None or self.axes is None or len(self.axes) != num_plots:
-            plt.ion()
+
+            if real_time:
+                plt.ion()
+            elif save:
+                plt.ioff()
+
             self.fig, self.axes = plt.subplots(
                 num_plots, 1, figsize=(fig_width, fig_height))
             if num_plots == 1:
@@ -275,6 +260,20 @@ class Yolo:
             self.axes[i].set_ylabel(key)
             self.axes[i].legend()
 
-        self.fig.tight_layout()
-        plt.draw()
-        plt.pause(0.001)
+        if real_time and save:
+            print("Choose either real_time or save")
+            raise Exception("Choose either real_time or save")
+        elif real_time:
+            self.fig.tight_layout()
+            plt.draw()
+            plt.pause(0.00001)
+        elif save:
+            # check if plots directory exists
+            if not os.path.exists("./plots/"):
+                os.makedirs("./plots/")
+
+            self.fig.tight_layout()
+            plt.savefig(f"./plots/signal_filtering.png")
+        else:
+            print("Choose either real_time or save")
+            raise Exception("Choose either real_time or save")

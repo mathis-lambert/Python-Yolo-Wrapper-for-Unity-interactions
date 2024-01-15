@@ -9,7 +9,7 @@ public class WristScript : MonoBehaviour
     public GameObject leftWrist;
     public GameObject rightWrist;
 
-    public GameObject socket;
+    private GameObject socket;
     public object positions;
     // Start is called before the first frame update
     private float localScale;
@@ -19,6 +19,7 @@ public class WristScript : MonoBehaviour
 
     void Start()
     {
+        socket = GameObject.Find("Socket");
         localScale = transform.localScale.x;
         height = GetComponent<CanvasScaler>().referenceResolution.y;
         width = GetComponent<CanvasScaler>().referenceResolution.x;

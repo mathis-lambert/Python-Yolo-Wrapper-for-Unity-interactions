@@ -14,7 +14,8 @@ public class UdpSocket : MonoBehaviour
     [SerializeField] string IP = "127.0.0.1"; // local host
     [SerializeField] int rxPort = 8000; // port to receive data from Python on
     [SerializeField] int txPort = 8001; // port to send data to Python on
-    public int handsDistance = 0;
+    public JSONNode DetectedObjects;
+    public int peopleCount = 0;
     public Vector3 leftWristPosition;
     public Vector3 rightWristPosition;
 
@@ -96,7 +97,8 @@ public class UdpSocket : MonoBehaviour
 
                 // get hands distance
                 obj = obj.AsArray;
-                handsDistance = obj[0]["hands_distance"];
+                DetectedObjects = obj;
+                peopleCount = obj.Count;
 
                 // get left and right wrist positions
                 var leftPositionsJson = obj[0]["left_wrist"].AsArray;

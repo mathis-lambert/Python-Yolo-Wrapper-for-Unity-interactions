@@ -1,5 +1,5 @@
 install:
-	pip install -r requirements.txt
+	pip install --force-reinstall -r requirements.txt
 	pip install -e .
 
 test:
@@ -9,7 +9,6 @@ run:
 	python scripts/main.py
 
 clean:
-	rm -rf build dist *.egg-info
-
+	rm -rf build dist
 
 .PHONY: install clean

@@ -18,6 +18,8 @@ parser.add_argument("--confidence", type=float, default=0.5,
                     help="confidence threshold, default is 0.5")
 parser.add_argument("--gpu", action="store_true",
                     help="use gpu for detection")
+parser.add_argument("--plot", action="store_true",
+                    help="Display plot to compare filtered and raw values")
 args = parser.parse_args()
 
 SHOW_VIDEO = args.show
@@ -40,7 +42,8 @@ class main():
             pass
         self.cap = cv2.VideoCapture(args.source)
 
-        self.yolo = Yolo(args.model, conf=args.confidence, gpu=args.gpu)
+        self.yolo = Yolo(args.model, conf=args.confidence,
+                         gpu=args.gpu, plot=args.plot)
 
     def start(self):
         """
@@ -55,12 +58,12 @@ class main():
             frame = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
 
             # Run detection and parse results
-            r, f = self.yolo.runDetection(
+            r, f = self.yolo.run_detection(
                 frame, mode=args.detect_method, tracker=args.tracker)
             # Get data from results
-            d = self.yolo.parseResults(r)
+            d = self.yolo.parse_results(r)
 
-            self.sock.SendData(self.yolo.getJsonData(d))  # send data
+            self.sock.SendData(self.yolo.get_json_data(d))  # send data
             print("Data sent")
 
             if SHOW_VIDEO:

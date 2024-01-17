@@ -1,17 +1,18 @@
 import os
-import re
 from torch import device
 from ultralytics import YOLO
 import json
 from pywui.utils import *
-from scipy.signal import butter, lfilter
 import matplotlib.pyplot as plt
 from collections import defaultdict
 import time  # For time measurement
+from threading import Thread
+from queue import Queue
 
 
 class Yolo:
-    def __init__(self, path, conf=0.5, gpu=False, plot=False, plot_show=False, plot_save=False, debug=False, log=False, log_path="./logs/", filter=False, filter_order=3):
+    def __init__(self, path, conf=0.5, gpu=False, plot=False, plot_show=False, plot_save=False, debug=False, log=False,
+                 log_path="./logs/", filter=False, filter_order=3):
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
@@ -28,6 +29,7 @@ class Yolo:
 
         self.debug = debug  # Debug mode
         self.log = log  # Log data to txt file
+        self.log_path = log_path
 
         self.filter = filter
         self.filter_order = filter_order
@@ -55,11 +57,13 @@ class Yolo:
         Parse predictions into a list of dictionaries
         """
         # print(results[0].boxes)
-        boxes = results[0].boxes.xyxy.tolist()
-        ids = results[0].boxes.id.tolist(
-        ) if results[0].boxes.id is not None else []
+        # boxes = results[0].boxes.xyxy.tolist()
+        queue = Queue()
+
+        ids = results[0].boxes.id.tolist() if results[0].boxes.id is not None else []
+
         keypoints = results[0].keypoints.xy.tolist()
-        keypoints_normalized = results[0].keypoints.xyn.tolist()
+        # keypoints_normalized = results[0].keypoints.xyn.tolist()
 
         self.peoples = list()
 
@@ -106,51 +110,81 @@ class Yolo:
                 "right_wrist": positions["right_wrist"],
                 "hands_distance": distance(positions["left_wrist"], positions["right_wrist"]),
                 "left_elbow_angle": angle(positions["left_wrist"], positions["left_elbow"], positions["left_shoulder"]),
-                "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"], positions["right_shoulder"]),
-                "left_arm_angle": round(angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
-                "right_arm_angle": round(angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
-                "left_shoulder_angle": round(angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
-                "right_shoulder_angle": round(angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
+                "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"],
+                                           positions["right_shoulder"]),
+                "left_arm_angle": round(
+                    angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
+                "right_arm_angle": round(
+                    angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
+                "left_shoulder_angle": round(
+                    angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
+                "right_shoulder_angle": round(
+                    angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
                 "is_valid": valid,
                 "id": id
             }
+            # print("LEFT", positions["left_wrist"], positions["left_elbow"])
+            # print("RIGHT", positions["right_wrist"], positions["right_elbow"])
+            if positions["left_wrist"][1] > positions["left_elbow"][1]:
+                # print("LEFT WRIST DOWN")
+                data["left_arm_angle"] = data["left_arm_angle"] * -1
+
+            if positions["right_wrist"][1] > positions["right_elbow"][1]:
+                # print("RIGHT WRIST DOWN")
+                data["right_arm_angle"] = data["right_arm_angle"] * -1
 
             # Fill last_values
             self.last_values[id].append(data)
 
             if self.filter:
-                ORDER = self.filter_order
                 # Filter
-                _fd = self.filter_signal(id, ORDER, verbose=True)
+                thread = Thread(target=self.thread_function_filter, args=(id, queue))
+                thread.start()
+                thread.join()  # Attendez que le thread se termine
+                _fd = queue.get()  # Récupère la valeur de retour
                 # Fill last_filtered_values if available
-                self.last_filtered_values[id].append(_fd) if _fd else None
-                # Append filtered data if available, else raw data to peoples list
-                self.peoples.append(_fd if _fd else data)
+                if _fd is not None:
+                    _fd["is_valid"] = valid
+                    _fd["id"] = id
+                    self.last_filtered_values[id].append(_fd)
+                    # Append filtered data if available, else raw data to peoples list
+                    self.peoples.append(_fd)
+                else:
+                    self.last_filtered_values[id].append(None)
+                    self.peoples.append(data)
             else:
                 self.peoples.append(data)
 
-        if (self.plot):
-            self.plot_filtered_data(save=True)
+        if self.plot:
+            self.plot_filtered_data(save=self.plot_save, real_time=self.plot_show)
 
         return self.peoples
+
+    def thread_function_filter(self, id, queue, verbose=False):
+        if self.filter:
+            filtered_data = self.filter_signal(id, self.filter_order, verbose=verbose)
+            queue.put(filtered_data)
+        else:
+            queue.put(None)
 
     @staticmethod
     def get_json_data(data):
         return json.dumps(data)
 
-    def filter_signal(self, id, order=5, verbose=False):
+    def filter_signal(self, person_id, order=5, verbose=False):
         """
-        Filter signal with a average filter
+        Filter signal with an average filter
         """
+        start_time: float = 0.00
         if verbose:
             start_time = time.perf_counter()
 
-        print(f"Filtering data with order: {order} and id: {id}")
-        if id is None:
+        print(f"Filtering data with order: {order} and id: {person_id}")
+        if person_id is None:
             print("No id")
             return None
 
-        samples = self.last_values[id][-order:]
+        samples = self.last_values[person_id][-order:]
         if len(samples) != order:
             print("Insufficient data")
             return None
@@ -229,7 +263,7 @@ class Yolo:
         for i, key in enumerate(unique_keys):
             # Extracting raw and filtered values for each key
             raw_values = []
-            for id, values in self.last_values.items():
+            for _, values in self.last_values.items():
                 for data in values:
                     if key in data:
                         if isinstance(data[key], dict) and ('x' in data[key] and 'y' in data[key]):
@@ -240,7 +274,7 @@ class Yolo:
                             raw_values.append(data[key])
 
             filtered_values = []
-            for id, values in self.last_filtered_values.items():
+            for _, values in self.last_filtered_values.items():
                 for data in values:
                     if key in data:
                         if isinstance(data[key], dict) and ('x' in data[key] or 'y' in data[key]):
@@ -267,6 +301,7 @@ class Yolo:
             self.fig.tight_layout()
             plt.draw()
             plt.pause(0.00001)
+            pass
         elif save:
             # check if plots directory exists
             if not os.path.exists("./plots/"):
@@ -274,6 +309,7 @@ class Yolo:
 
             self.fig.tight_layout()
             plt.savefig(f"./plots/signal_filtering.png")
+            pass
         else:
             print("Choose either real_time or save")
             raise Exception("Choose either real_time or save")

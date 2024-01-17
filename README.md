@@ -22,8 +22,8 @@ this will create a virtual env and install the dependencies
 ```bash
 cd python
 python3 -m venv venv
-source venv/bin/activate
-make install
+source venv/bin/activate # On windows : venv\Scripts\activate
+make install # make is not available on windows, run install.bat instead (not tested)
 ```
 
 ## Usage
@@ -67,7 +67,7 @@ python scripts/the_script_you_want.py
 Open a terminal and run these commands :
 ```bash
 cd python
-source venv/bin/activate
+source venv/bin/activate # On windows : venv\Scripts\activate
 pywui-test
 ```
 

@@ -1,3 +1,8 @@
+############################
+# @Author: Mathis LAMBERT
+# @Date: Janvier 2024
+############################
+
 from pywui.udpsocket import updsocket as s
 import cv2
 from pywui.yolo import Yolo

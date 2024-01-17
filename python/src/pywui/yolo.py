@@ -1,3 +1,8 @@
+############################
+# @Author: Mathis LAMBERT
+# @Date: Janvier 2024
+############################
+
 import os
 from torch import device
 from ultralytics import YOLO
@@ -60,7 +65,8 @@ class Yolo:
         # boxes = results[0].boxes.xyxy.tolist()
         queue = Queue()
 
-        ids = results[0].boxes.id.tolist() if results[0].boxes.id is not None else []
+        ids = results[0].boxes.id.tolist(
+        ) if results[0].boxes.id is not None else []
 
         keypoints = results[0].keypoints.xy.tolist()
         # keypoints_normalized = results[0].keypoints.xyn.tolist()
@@ -138,7 +144,8 @@ class Yolo:
 
             if self.filter:
                 # Filter
-                thread = Thread(target=self.thread_function_filter, args=(id, queue))
+                thread = Thread(
+                    target=self.thread_function_filter, args=(id, queue))
                 thread.start()
                 thread.join()  # Attendez que le thread se termine
                 _fd = queue.get()  # Récupère la valeur de retour
@@ -156,13 +163,15 @@ class Yolo:
                 self.peoples.append(data)
 
         if self.plot:
-            self.plot_filtered_data(save=self.plot_save, real_time=self.plot_show)
+            self.plot_filtered_data(
+                save=self.plot_save, real_time=self.plot_show)
 
         return self.peoples
 
     def thread_function_filter(self, id, queue, verbose=False):
         if self.filter:
-            filtered_data = self.filter_signal(id, self.filter_order, verbose=verbose)
+            filtered_data = self.filter_signal(
+                id, self.filter_order, verbose=verbose)
             queue.put(filtered_data)
         else:
             queue.put(None)

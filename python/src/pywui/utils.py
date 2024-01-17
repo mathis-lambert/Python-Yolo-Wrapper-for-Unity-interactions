@@ -1,3 +1,8 @@
+############################
+# @Author: Mathis LAMBERT
+# @Date: Janvier 2024
+############################
+
 import numpy as np
 
 

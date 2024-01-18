@@ -88,6 +88,7 @@ class main:
         try:
             args.source = int(args.source)
         except:
+            print("Source is not an int, set ")
             pass
         self.cap = cv2.VideoCapture(args.source)
 

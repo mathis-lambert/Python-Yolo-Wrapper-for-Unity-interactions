@@ -18,6 +18,22 @@ from queue import Queue
 class Yolo:
     def __init__(self, path, conf=0.5, gpu=False, plot=False, plot_show=False, plot_save=False, debug=False, log=False,
                  log_path="./logs/", filter=False, filter_order=3):
+        """
+        Initialize Yolo class
+
+        Args:
+            path (str): Path to the model
+            conf (float, optional): Confidence threshold. Defaults to 0.5.
+            gpu (bool, optional): Use gpu for detection. Defaults to False.
+            plot (bool, optional): Plot data. Defaults to False.
+            plot_show (bool, optional): Show plot in real time. Defaults to False.
+            plot_save (bool, optional): Save plot to png file. Defaults to False.
+            debug (bool, optional): Debug mode. Defaults to False.
+            log (bool, optional): Log data to txt file. Defaults to False.
+            log_path (str, optional): Path to the log file. Defaults to "./logs/".
+            filter (bool, optional): Filter data. Defaults to False.
+            filter_order (int, optional): Filter order. Defaults to 3.
+        """
         self.model = YOLO(path)
         self.cap = None
         self.peoples = list()
@@ -42,6 +58,14 @@ class Yolo:
     def run_detection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml") -> tuple:
         """
         Run detection on a frame and return results and a plot
+
+        Args:
+            frame (np.array): Frame to run detection on
+            mode (str, optional): Detection mode, predict or track. Defaults to "predict".
+            tracker (str, optional): Path to the tracker file. Defaults to "./trackers/botsort.yaml".
+
+        Returns:
+            tuple: Results and plot
         """
         # Prédire les poses
         if mode == "predict":
@@ -60,9 +84,13 @@ class Yolo:
     def parse_results(self, results):
         """
         Parse predictions into a list of dictionaries
+
+        Args:
+            results (list): List of predictions
+
+        Returns:
+            list: List of dictionaries
         """
-        # print(results[0].boxes)
-        # boxes = results[0].boxes.xyxy.tolist()
         queue = Queue()
 
         ids = results[0].boxes.id.tolist(
@@ -129,14 +157,11 @@ class Yolo:
                 "is_valid": valid,
                 "id": id
             }
-            # print("LEFT", positions["left_wrist"], positions["left_elbow"])
-            # print("RIGHT", positions["right_wrist"], positions["right_elbow"])
+
             if positions["left_wrist"][1] > positions["left_elbow"][1]:
-                # print("LEFT WRIST DOWN")
                 data["left_arm_angle"] = data["left_arm_angle"] * -1
 
             if positions["right_wrist"][1] > positions["right_elbow"][1]:
-                # print("RIGHT WRIST DOWN")
                 data["right_arm_angle"] = data["right_arm_angle"] * -1
 
             # Fill last_values
@@ -168,7 +193,19 @@ class Yolo:
 
         return self.peoples
 
-    def thread_function_filter(self, id, queue, verbose=False):
+    def thread_function_filter(self, id, queue, verbose=False) -> None:
+        """
+        Thread function to filter data
+
+        Args:
+            id (str): Id of the person
+            queue (Queue): Queue to put filtered data in
+            verbose (bool, optional): Verbose mode. Defaults to False.
+
+        Returns:
+            None
+        """
+
         if self.filter:
             filtered_data = self.filter_signal(
                 id, self.filter_order, verbose=verbose)
@@ -183,6 +220,14 @@ class Yolo:
     def filter_signal(self, person_id, order=5, verbose=False):
         """
         Filter signal with an average filter
+
+        Args:
+            person_id (str): Id of the person
+            order (int, optional): Order of the filter. Defaults to 5.
+            verbose (bool, optional): Verbose mode. Defaults to False.
+
+        Returns:
+            dict: Filtered data
         """
         start_time: float = 0.00
         if verbose:
@@ -226,12 +271,22 @@ class Yolo:
         return dict(filtered_data)
 
     def get_peoples(self):
+        """
+        Get peoples list
+        """
         return self.peoples
 
     def plot_filtered_data(self, real_time=False, save=False):
         """
         Plot comparison graphs for each key in self.last_filtered_values/last_values
         to compare filtered values with raw values
+
+        Args:
+            real_time (bool, optional): Display plot in real time. Defaults to False.
+            save (bool, optional): Save plot to png file. Defaults to False.
+
+        Returns:
+            None
         """
         # Collecting unique keys for dynamic subplot creation
         unique_keys = set()

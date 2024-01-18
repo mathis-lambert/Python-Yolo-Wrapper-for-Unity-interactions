@@ -37,5 +37,37 @@ def test_get_peoples(yolo):
     assert isinstance(peoples, list)
     assert len(peoples) > 0
 
+
+def test_filter_signal(yolo):
+    signal = [
+        {
+            "a": 0,
+            "b": 1,
+        },
+        {
+            "a": 2,
+            "b": 3,
+        },
+        {
+            "a": 4,
+            "b": 5,
+        },
+        {
+            "a": 6,
+            "b": 7,
+        },
+        {
+            "a": 8,
+            "b": 9,
+        }
+    ]
+    yolo.last_values["id_1"] = signal
+    filtered_signal = yolo.filter_signal("id_1")
+    assert isinstance(filtered_signal, dict)
+    assert len(filtered_signal) == 2
+    assert filtered_signal["a"] == 4
+    assert filtered_signal["b"] == 5
+
+
 # to run tests
 # python -m pytest -v

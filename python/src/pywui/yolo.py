@@ -234,7 +234,7 @@ class Yolo:
             start_time = time.perf_counter()
 
         print(f"Filtering data with order: {order} and id: {person_id}")
-        if person_id is None:
+        if person_id is None or person_id not in self.last_values:
             print("No id")
             return None
 

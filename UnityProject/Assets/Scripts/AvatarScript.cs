@@ -45,7 +45,7 @@ public class AvatarScript : MonoBehaviour
         }
     }
 
-    void RotateShoulders(JSONNode Obj)
+    void Rotate(JSONNode Obj)
     {
         // Appliquer une rotation aux épaules
         if (leftShoulder != null)
@@ -100,7 +100,7 @@ public class AvatarScript : MonoBehaviour
 
         if (assignedPerson < peopleCount)
         {
-            RotateShoulders(DetectedObjects[assignedPerson]);
+            Rotate(DetectedObjects[assignedPerson]);
         }
         else
         {

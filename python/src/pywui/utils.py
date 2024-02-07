@@ -80,3 +80,16 @@ def get_head_inclination(positions):
         return "droite"
     else:
         return "centre"
+
+def midpoint(a, b):
+    """
+    Calculate the midpoint between two points
+
+    Args:
+        a (tuple): first point
+        b (tuple): second point
+
+    Returns:
+        (tuple): midpoint between a and b
+    """
+    return ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)

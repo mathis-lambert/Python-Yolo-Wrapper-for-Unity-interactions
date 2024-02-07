@@ -55,6 +55,9 @@ class Yolo:
         self.filter = filter
         self.filter_order = filter_order
 
+        self.img_width = None
+        self.img_height = None
+
     def run_detection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml") -> tuple:
         """
         Run detection on a frame and return results and a plot
@@ -67,6 +70,8 @@ class Yolo:
         Returns:
             tuple: Results and plot
         """
+
+        self.img_height, self.img_width, _ = frame.shape
         # Prédire les poses
         if mode == "predict":
             results = self.model(
@@ -97,7 +102,7 @@ class Yolo:
         ) if results[0].boxes.id is not None else []
 
         keypoints = results[0].keypoints.xy.tolist()
-        # keypoints_normalized = results[0].keypoints.xyn.tolist()
+        keypoints_normalized = results[0].keypoints.xyn.tolist()
 
         self.peoples = list()
 
@@ -132,6 +137,9 @@ class Yolo:
                 "right_ankle": person[16]
             }
 
+            positions["shoulder_midpoint"] = midpoint(
+                positions["left_shoulder"], positions["right_shoulder"])
+
             if positions["left_wrist"] != [0, 0] or positions["right_wrist"] != [0, 0] and positions["nose"] != [0, 0]:
                 valid = True
             else:
@@ -154,9 +162,12 @@ class Yolo:
                     angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
                 "right_shoulder_angle": round(
                     angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
+                "left_offset": 1 - (positions["shoulder_midpoint"][0] / self.img_width),
                 "is_valid": valid,
                 "id": id
             }
+
+            print("OFFSET LEFT :", data["left_offset"])
 
             if positions["left_wrist"][1] > positions["left_elbow"][1]:
                 data["left_arm_angle"] = data["left_arm_angle"] * -1
@@ -261,7 +272,7 @@ class Yolo:
                                   for v in values.values() if v]
 
         for key, values in single_values.items():
-            filtered_data[key] = sum(values) / len(values) if values else None
+            filtered_data[key] = sum(values) / len(values) if values else []
 
         if verbose:
             end_time = time.perf_counter()

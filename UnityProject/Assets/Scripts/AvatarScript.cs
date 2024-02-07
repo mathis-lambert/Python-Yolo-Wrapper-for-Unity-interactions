@@ -13,11 +13,16 @@ public class AvatarScript : MonoBehaviour
     public Transform rightShoulder;
     public Transform leftElbow;
     public Transform rightElbow;
+    public int startX = -2;
+    public int endX = 2;
+    public float rangeX;
 
     // Start is called before the first frame update
     void Start()
     {
         socket = GameObject.Find("Socket");
+        rangeX = endX - startX;
+        Debug.Log(rangeX);
         AssignShoulders();
     }
 
@@ -100,6 +105,10 @@ public class AvatarScript : MonoBehaviour
 
         if (assignedPerson < peopleCount)
         {
+            float offsetLeft = DetectedObjects[assignedPerson]["left_offset"];
+            float xPos = startX + (float)(offsetLeft * rangeX);
+            Debug.Log(xPos);
+            transform.position = new Vector3(xPos, 0, 0);
             Rotate(DetectedObjects[assignedPerson]);
         }
         else

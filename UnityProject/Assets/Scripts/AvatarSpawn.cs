@@ -11,18 +11,23 @@ public class AvatarSpawn : MonoBehaviour
     public float SpawnRadius = 10f;
     private int peopleCount;
     private int lastPeopleCount = 0;
+    public int startX = -2;
+    public int endX = 2;
+    public int rangeX;
 
     // Start is called before the first frame update
     void Start()
     {
         socket = GameObject.Find("Socket");
         peopleCount = socket.GetComponent<UdpSocket>().peopleCount;
+        rangeX = endX - startX;
 
         for (int i = 0; i < peopleCount; i++)
         {
             if (socket.GetComponent<UdpSocket>().DetectedObjects[i]["is_valid"])
             {
-                SpawnAvatar(i);
+                float offsetLeft = socket.GetComponent<UdpSocket>().DetectedObjects[i]["left_offset"];
+                SpawnAvatar(i, offsetLeft);
             }
         }
     }
@@ -35,6 +40,7 @@ public class AvatarSpawn : MonoBehaviour
         {
             if (socket.GetComponent<UdpSocket>().DetectedObjects[i]["is_valid"])
             {
+
                 count++;
             }
         }
@@ -42,11 +48,11 @@ public class AvatarSpawn : MonoBehaviour
     }
 
 
-    void SpawnAvatar(int i)
+    void SpawnAvatar(int i, float offsetLeft)
     {
         // spawn avatar with i parameter
-        Vector3 SpawnPos = Random.insideUnitSphere * SpawnRadius;
-        SpawnPos = new Vector3(transform.position.x, 0, transform.position.z) + new Vector3(SpawnPos.x, 0, SpawnPos.z);
+        float leftPos = offsetLeft * rangeX;
+        Vector3 SpawnPos = new(leftPos, 0, 0);
         Quaternion SpawnRot = Quaternion.Euler(0, 180, 0);
         GameObject avatar = Instantiate(avatarPrefab, SpawnPos, SpawnRot);
         avatar.name = "Avatar " + i;
@@ -69,7 +75,8 @@ public class AvatarSpawn : MonoBehaviour
                 {
                     if (socket.GetComponent<UdpSocket>().DetectedObjects[i]["is_valid"])
                     {
-                        SpawnAvatar(i);
+                        float offsetLeft = socket.GetComponent<UdpSocket>().DetectedObjects[i]["left_offset"];
+                        SpawnAvatar(i, offsetLeft);
                     }
                 }
             }

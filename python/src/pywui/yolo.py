@@ -14,6 +14,8 @@ import time  # For time measurement
 from threading import Thread
 from queue import Queue
 
+os.environ['YOLO_VERBOSE'] = 'False'  # Set YOLO verbose to false
+
 
 class Yolo:
     def __init__(self, path, conf=0.5, gpu=False, plot=False, plot_show=False, plot_save=False, debug=False, log=False,
@@ -75,10 +77,10 @@ class Yolo:
         # Prédire les poses
         if mode == "predict":
             results = self.model(
-                frame, conf=self.confidence, device=self.device)
+                frame, conf=self.confidence, device=self.device, verbose=self.debug)
         elif mode == "track":
             results = self.model.track(
-                frame, tracker=tracker, persist=True, conf=self.confidence, device=self.device)
+                frame, tracker=tracker, persist=True, conf=self.confidence, device=self.device, verbose=self.debug)
         else:
             raise Exception("Mode must be 'predict' or 'track'")
 
@@ -149,6 +151,7 @@ class Yolo:
 
             # Data is a dictionary of positions, if you want to add more data, add it here, it will be added to the list
             # and then filtered
+            # NOTE: Notice that the size sended in the socket is limited, so be careful with the size of the data
             data = {
                 "left_wrist": positions["left_wrist"],
                 "right_wrist": positions["right_wrist"],
@@ -167,29 +170,10 @@ class Yolo:
                 "left_ear": positions["left_ear"],
                 "right_ear": positions["right_ear"],
                 "nose": positions["nose"],
-                # "hands_distance": distance(positions["left_wrist"], positions["right_wrist"]),
-                # "left_elbow_angle": angle(positions["left_wrist"], positions["left_elbow"], positions["left_shoulder"]),
-                # "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"],
-                #                            positions["right_shoulder"]),
-                # "left_arm_angle": round(
-                #     angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
-                # "right_arm_angle": round(
-                #     angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
-                # "left_shoulder_angle": round(
-                #     angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
-                # "right_shoulder_angle": round(
-                #     angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
                 "inter_leg_position": [positions["hip_midpoint"][0], positions["hip_midpoint"][1]],
                 "is_valid": valid,
                 "id": id
             }
-
-
-            # if positions["left_wrist"][1] > positions["left_elbow"][1]:
-            #     data["left_arm_angle"] = data["left_arm_angle"] * -1
-            #
-            # if positions["right_wrist"][1] > positions["right_elbow"][1]:
-            #     data["right_arm_angle"] = data["right_arm_angle"] * -1
 
             # Fill last_values
             self.last_values[id].append(data)
@@ -260,7 +244,8 @@ class Yolo:
         if verbose:
             start_time = time.perf_counter()
 
-        print(f"Filtering data with order: {order} and id: {person_id}")
+        if self.debug:
+            print(f"Filtering data with order: {order} and id: {person_id}")
         if person_id is None or person_id not in self.last_values:
             print("No id")
             return None

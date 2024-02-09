@@ -49,8 +49,14 @@ class updsocket():
         # Use this function to send string to C#
         length = len(strToSend)
         print("Sending data of length: " + str(length))
-        self.udpSock.sendto(bytes(strToSend, 'utf-8'),
-                            (self.udpIP, self.udpSendPort))
+        try:
+            self.udpSock.sendto(bytes(strToSend, 'utf-8'),
+                                (self.udpIP, self.udpSendPort))
+        except OSError as e:
+            print("Error while sending data. Is the other application running?")
+            pass
+        finally:
+            pass
 
     def ReceiveData(self):
         """

@@ -101,16 +101,16 @@ class Yolo:
         ids = results[0].boxes.id.tolist(
         ) if results[0].boxes.id is not None else []
 
-        keypoints = results[0].keypoints.xy.tolist()
+        # keypoints = results[0].keypoints.xy.tolist()
         keypoints_normalized = results[0].keypoints.xyn.tolist()
 
         self.peoples = list()
 
-        for person in keypoints:
+        for person in keypoints_normalized:
             if len(person) == 0:
                 continue
 
-            index = keypoints.index(person)
+            index = keypoints_normalized.index(person)
             id = "id_" + str(int(ids[index] if len(ids) > 0 else index))
 
             if self.last_values.get(id) is None:
@@ -139,8 +139,10 @@ class Yolo:
 
             positions["shoulder_midpoint"] = midpoint(
                 positions["left_shoulder"], positions["right_shoulder"])
+            positions["hip_midpoint"] = midpoint(
+                positions["left_hip"], positions["right_hip"])
 
-            if positions["left_wrist"] != [0, 0] or positions["right_wrist"] != [0, 0] and positions["nose"] != [0, 0]:
+            if positions["left_ankle"] != [0, 0] or positions["right_ankle"] != [0, 0] and positions["nose"] != [0, 0]:
                 valid = True
             else:
                 valid = False
@@ -150,30 +152,44 @@ class Yolo:
             data = {
                 "left_wrist": positions["left_wrist"],
                 "right_wrist": positions["right_wrist"],
-                "hands_distance": distance(positions["left_wrist"], positions["right_wrist"]),
-                "left_elbow_angle": angle(positions["left_wrist"], positions["left_elbow"], positions["left_shoulder"]),
-                "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"],
-                                           positions["right_shoulder"]),
-                "left_arm_angle": round(
-                    angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
-                "right_arm_angle": round(
-                    angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
-                "left_shoulder_angle": round(
-                    angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
-                "right_shoulder_angle": round(
-                    angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
-                "left_offset": 1 - (positions["shoulder_midpoint"][0] / self.img_width),
+                "left_shoulder": positions["left_shoulder"],
+                "right_shoulder": positions["right_shoulder"],
+                "left_elbow": positions["left_elbow"],
+                "right_elbow": positions["right_elbow"],
+                "left_hip": positions["left_hip"],
+                "right_hip": positions["right_hip"],
+                "left_knee": positions["left_knee"],
+                "right_knee": positions["right_knee"],
+                "left_ankle": positions["left_ankle"],
+                "right_ankle": positions["right_ankle"],
+                "left_eye": positions["left_eye"],
+                "right_eye": positions["right_eye"],
+                "left_ear": positions["left_ear"],
+                "right_ear": positions["right_ear"],
+                "nose": positions["nose"],
+                # "hands_distance": distance(positions["left_wrist"], positions["right_wrist"]),
+                # "left_elbow_angle": angle(positions["left_wrist"], positions["left_elbow"], positions["left_shoulder"]),
+                # "right_elbow_angle": angle(positions["right_wrist"], positions["right_elbow"],
+                #                            positions["right_shoulder"]),
+                # "left_arm_angle": round(
+                #     angle(positions["left_shoulder"], positions["left_elbow"], positions["left_wrist"]), 2),
+                # "right_arm_angle": round(
+                #     angle(positions["right_shoulder"], positions["right_elbow"], positions["right_wrist"]), 2),
+                # "left_shoulder_angle": round(
+                #     angle(positions["left_hip"], positions["left_shoulder"], positions["left_elbow"]), 2),
+                # "right_shoulder_angle": round(
+                #     angle(positions["right_hip"], positions["right_shoulder"], positions["right_elbow"]), 2),
+                "inter_leg_position": [positions["hip_midpoint"][0], positions["hip_midpoint"][1]],
                 "is_valid": valid,
                 "id": id
             }
 
-            print("OFFSET LEFT :", data["left_offset"])
 
-            if positions["left_wrist"][1] > positions["left_elbow"][1]:
-                data["left_arm_angle"] = data["left_arm_angle"] * -1
-
-            if positions["right_wrist"][1] > positions["right_elbow"][1]:
-                data["right_arm_angle"] = data["right_arm_angle"] * -1
+            # if positions["left_wrist"][1] > positions["left_elbow"][1]:
+            #     data["left_arm_angle"] = data["left_arm_angle"] * -1
+            #
+            # if positions["right_wrist"][1] > positions["right_elbow"][1]:
+            #     data["right_arm_angle"] = data["right_arm_angle"] * -1
 
             # Fill last_values
             self.last_values[id].append(data)

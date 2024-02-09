@@ -657,6 +657,8 @@ MonoBehaviour:
   rightAnkle: {fileID: 3832163276841729782}
   leftKnee: {fileID: 7386910909802996186}
   rightKnee: {fileID: 1641135153643409482}
+  leftShoulder: {fileID: 3625927557619014657}
+  rightShoulder: {fileID: 643707552928884662}
   isArmsUp: 0
   isArmsDown: 0
   assignedPerson: -1

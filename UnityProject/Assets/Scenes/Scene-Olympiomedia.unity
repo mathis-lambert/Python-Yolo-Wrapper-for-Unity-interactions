@@ -906,6 +906,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2411204461687977194, guid: 82697823250ab4f26ad6a59cf48e60f1, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2411204461687977194, guid: 82697823250ab4f26ad6a59cf48e60f1, type: 3}
       propertyPath: avatarPrefab
       value: 
       objectReference: {fileID: 2538127283455509816, guid: ccbee718790a54781a2870ffe5096f50, type: 3}

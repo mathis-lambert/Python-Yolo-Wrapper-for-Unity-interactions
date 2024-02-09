@@ -48,7 +48,9 @@ class updsocket():
     def SendData(self, strToSend):
         # Use this function to send string to C#
         length = len(strToSend)
-        print("Sending data of length: " + str(length))
+        if not self.suppressWarnings:
+            print("Sending data of length: " + str(length))
+
         try:
             self.udpSock.sendto(bytes(strToSend, 'utf-8'),
                                 (self.udpIP, self.udpSendPort))

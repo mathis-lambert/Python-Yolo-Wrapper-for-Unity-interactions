@@ -81,14 +81,15 @@ class main:
             portTX=8000,
             portRX=8001,
             enableRX=True,
-            suppressWarnings=True,
+            suppressWarnings=not args.debug,
         )
 
         # Create video capture object
         try:
             args.source = int(args.source)
         except:
-            print("Source is not an int, set ")
+            if args.debug:
+                print("Source is not an int, setting source to path")
             pass
         self.cap = cv2.VideoCapture(args.source)
 
@@ -110,6 +111,9 @@ class main:
         """
         Start sending and receiving data with yolo detections and poses
         """
+        print("pywui is running ;) - Mathis LAMBERT 2024")
+        print("Press ctrl+c to stop the program")
+
         while True:
             # Read frame from video capture object
             ret, frame = self.cap.read()
@@ -126,7 +130,6 @@ class main:
             d = self.yolo.parse_results(r)
 
             self.sock.SendData(self.yolo.get_json_data(d))  # send data
-            print("Data sent")
 
             if SHOW_VIDEO:
                 cv2.imshow("frame", f)
@@ -136,7 +139,7 @@ class main:
             data = self.sock.ReadReceivedData()  # read data
 
             if (
-                data != None
+                    data != None
             ):  # if NEW data has been received since last ReadReceivedData function call
                 print(data)  # print new received data
 

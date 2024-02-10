@@ -81,9 +81,20 @@ pywui --model ./models/yolov8s-pose.pt --detect-method track --source 0 --conf 0
 ```
 
 ### Unity
-- Open the scene `Assets/Scenes/PeopleInteraction.unity`
+#### Main Scene
+- Open the scene `Assets/Scenes/Main.unity`
 - Click on the play button
-- You should see as many avatar as people detected by the python script and the avatars should move to the position of the people detected
+- You should see as many articulation groups as people detected by the python script and the articulations should move to the position of the people detected
+- <img width="675" alt="image" src="https://github.com/mathis-lambert/Python-Yolo-Wrapper-for-Unity-interactions/assets/93223257/961683fb-3a5c-4ae8-b1d1-efb04767c28b">
+
+
+#### Articulation Scene
+- Open the scene `Assets/Scenes/Articulation.unity`
+- Click on the play button
+- You should see as many articulation groups as people detected by the python script and the articulations should move to the position of the people detected
+- <img width="669" alt="image" src="https://github.com/mathis-lambert/Python-Yolo-Wrapper-for-Unity-interactions/assets/93223257/4295744c-4853-4afc-8dc1-295cd1d97f3a">
+
+
 
 ## Current issues
 - `python3` might not work, use `python` instead

@@ -77,7 +77,7 @@ The use case is simple, the python script will send the position of the detected
 ### Python
 Run the command :
 ```bash
-pywui --model ./models/yolov8s-pose.pt --detect-method track --source 0 --conf 0.5 --filter
+pywui --model ./models/yolov8s-pose.pt --detect-method track --source 0 --conf 0.7 --filter
 ```
 
 ### Unity

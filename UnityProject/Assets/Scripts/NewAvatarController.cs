@@ -91,7 +91,7 @@ public class NewAvatarController : MonoBehaviour
         rightAnkle.transform.position = new Vector3(EndX - rightAnklePos[0] * RangeX, EndY - rightAnklePos[1] * RangeY, rightAnkle.transform.position.z);
         leftKnee.transform.position = new Vector3(EndX - leftKneePos[0] * RangeX, EndY - leftKneePos[1] * RangeY, leftKnee.transform.position.z);
         rightKnee.transform.position = new Vector3(EndX - rightKneePos[0] * RangeX, EndY - rightKneePos[1] * RangeY, rightKnee.transform.position.z);
-        transform.position = new Vector3(EndX - offset[0] * RangeX, EndY - offset[1] * RangeY, transform.position.z);
+        transform.position = new Vector3(EndX - offset[0] * RangeX, EndY - offset[1] * RangeY + 0.1f, transform.position.z);
 
         if (leftWrist.transform.position.y > leftShoulder.transform.position.y && rightWrist.transform.position.y > rightShoulder.transform.position.y)
         {

@@ -138,10 +138,9 @@ class main:
 
             data = self.sock.ReadReceivedData()  # read data
 
-            if (
-                    data != None
-            ):  # if NEW data has been received since last ReadReceivedData function call
-                print(data)  # print new received data
+            if args.debug:
+                if data is not None:  # if NEW data has been received since last ReadReceivedData function call
+                    print(data)  # print new received data
 
 
 if __name__ == "__main__":

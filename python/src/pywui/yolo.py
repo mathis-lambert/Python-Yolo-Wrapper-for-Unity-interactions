@@ -252,7 +252,8 @@ class Yolo:
 
         samples = self.last_values[person_id][-order:]
         if len(samples) != order:
-            print("Insufficient data")
+            if self.debug:
+                print("Insufficient data")
             return None
 
         data = defaultdict(lambda: defaultdict(list))

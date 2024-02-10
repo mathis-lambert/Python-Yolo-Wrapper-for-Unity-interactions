@@ -14,6 +14,8 @@ public class NewAvatarController : MonoBehaviour
     public GameObject rightAnkle;
     public GameObject leftKnee;
     public GameObject rightKnee;
+    public GameObject leftShoulder;
+    public GameObject rightShoulder;
 
     // public GameObject rightElbowHint;
     public bool isArmsUp = false;
@@ -89,27 +91,19 @@ public class NewAvatarController : MonoBehaviour
         rightAnkle.transform.position = new Vector3(EndX - rightAnklePos[0] * RangeX, EndY - rightAnklePos[1] * RangeY, rightAnkle.transform.position.z);
         leftKnee.transform.position = new Vector3(EndX - leftKneePos[0] * RangeX, EndY - leftKneePos[1] * RangeY, leftKnee.transform.position.z);
         rightKnee.transform.position = new Vector3(EndX - rightKneePos[0] * RangeX, EndY - rightKneePos[1] * RangeY, rightKnee.transform.position.z);
-        transform.position = new Vector3(EndX - offset[0] * RangeX, EndY - offset[1] * RangeY, transform.position.z);
+        transform.position = new Vector3(EndX - offset[0] * RangeX, EndY - offset[1] * RangeY + 0.1f, transform.position.z);
 
-        if (isArmsUp)
+        if (leftWrist.transform.position.y > leftShoulder.transform.position.y && rightWrist.transform.position.y > rightShoulder.transform.position.y)
         {
-            if (leftWristPos[1] < leftShoulderPos[1] && rightWristPos[1] < rightShoulderPos[1])
-            {
-                Debug.Log("Arms Down");
-                isArmsUp = false;
-                isArmsDown = true;
-            }
+            Debug.Log("Arms Up");
+            isArmsUp = true;
+            isArmsDown = false;
         }
-        else if (isArmsDown)
+        else
         {
-            if (leftWristPos[1] > leftShoulderPos[1] && rightWristPos[1] > rightShoulderPos[1])
-            {
-                Debug.Log("Arms Up");
-                isArmsUp = true;
-                isArmsDown = false;
-            }
+            Debug.Log("Arms Down");
+            isArmsUp = false;
+            isArmsDown = true;
         }
-
-
     }
 }

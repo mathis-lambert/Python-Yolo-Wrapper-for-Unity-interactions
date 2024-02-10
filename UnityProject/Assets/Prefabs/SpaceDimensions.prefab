@@ -47,11 +47,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 33b369ea1086349e8a997338e83ee170, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  StartX: {fileID: 5179586162475664730}
+  StartXY: {fileID: 5179586162475664730}
   EndX: {fileID: 2738719663447688233}
+  EndY: {fileID: 5787449543478855688}
   RangeX: 0
-  StartXValue: 0
+  RangeY: 0
+  StartXYValue:
+  - 0
+  - 0
   EndXValue: 0
+  EndYValue: 0
 --- !u!1 &2738719663447688233
 GameObject:
   m_ObjectHideFlags: 0

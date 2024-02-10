@@ -666,6 +666,10 @@ PrefabInstance:
       propertyPath: m_RenderMode
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2725770179509086996, guid: 6aaabe3d5a27b4c4f9294c2d027b92c2, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: a3016690c1a9e3e4fb9423913e1a9776, type: 2}
     - target: {fileID: 3091135947648227680, guid: 6aaabe3d5a27b4c4f9294c2d027b92c2, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 

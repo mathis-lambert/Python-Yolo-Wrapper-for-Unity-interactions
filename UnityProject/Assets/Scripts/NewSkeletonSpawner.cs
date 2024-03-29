@@ -6,8 +6,8 @@ using UnityEngine;
 public class NewSkeletonSpawner : MonoBehaviour
 {
     private GameObject socket;
-    // avatar prefab
-    public GameObject avatarSkeletonPrefab;
+    // avatar prefabs array
+    public GameObject[] AvatarsPrefabs;
     public float SpawnRadius = 10f;
     private int peopleCount;
     private int lastPeopleCount = 0;
@@ -62,6 +62,10 @@ public class NewSkeletonSpawner : MonoBehaviour
             float height = offsetBottom * 10;
             Vector3 SpawnPos = new(leftPos, height, transform.position.z);
             Quaternion SpawnRot = Quaternion.Euler(0, 180, 0);
+            // select a random avatar prefab
+            Debug.Log(UnityEngine.Random.Range(0, AvatarsPrefabs.Length));
+            Debug.Log(AvatarsPrefabs.Length);
+            GameObject avatarSkeletonPrefab = AvatarsPrefabs[UnityEngine.Random.Range(0, AvatarsPrefabs.Length)];
             GameObject avatar = Instantiate(avatarSkeletonPrefab, SpawnPos, SpawnRot);
             avatar.name = name;
             avatar.GetComponent<NewAvatarController>().assignedPerson = i;

@@ -1,4 +1,4 @@
-numpy>=1.26.2
-opencv_python>=4.8.1.78
-ultralytics>=8.0.208
+numpy>=1.26.4
+opencv_python>=4.9.0.80
+ultralytics>=8.1.35
 pytest>=7.4.3

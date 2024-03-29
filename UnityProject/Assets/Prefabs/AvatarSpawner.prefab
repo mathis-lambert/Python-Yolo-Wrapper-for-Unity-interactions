@@ -44,7 +44,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 856604f93836a4357a5f6e5c24ff1718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  avatarSkeletonPrefab: {fileID: 1578036340986044652, guid: 6c18430cbff134d44a2bd4b7b2d45f06, type: 3}
+  AvatarsPrefabs:
+  - {fileID: 3162562807946948925, guid: a2b18a8e35560455095d5a25f2e7d00a, type: 3}
+  - {fileID: 2587447153740001984, guid: 6f5ae421a20cf4a889b6c65648308107, type: 3}
   SpawnRadius: 10
   SpaceDimensions: {fileID: 0}
   assignedPerson: 0

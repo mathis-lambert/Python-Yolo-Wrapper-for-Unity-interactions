@@ -7,6 +7,7 @@ from pywui.udpsocket import updsocket as s
 import cv2
 from pywui.yolo import Yolo
 import argparse
+import platform
 
 # Parse arguments from command line
 parser = argparse.ArgumentParser()
@@ -91,7 +92,13 @@ class main:
             if args.debug:
                 print("Source is not an int, setting source to path")
             pass
-        self.cap = cv2.VideoCapture(args.source)
+        # Détecte le système d'exploitation
+        if platform.system() == 'Windows':
+            # Sur Windows, utilise le backend MSMF
+            self.cap = cv2.VideoCapture(args.source, cv2.CAP_MSMF)
+        else:
+            # Sur les autres systèmes d'exploitation, utilise le backend par défaut
+            self.cap = cv2.VideoCapture(args.source)
 
         self.yolo = Yolo(
             path=args.model,

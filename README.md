@@ -10,6 +10,7 @@ This source code has been developped to allow python and these libraries communi
 - This installation guide has been tested on Linux and MacOS, but it should work on Windows too with some modifications
 
 ## Installation
+⚠️ if you have a windows PC with RTX GPU and Intel CPU check the follow installation guide ⚠️
 Clone this public repo with wherever you want
 ```bash
 git clone https://github.com/mathis-lambert/python-yolo-wrapper-for-unity-interactions yolo_with_unity

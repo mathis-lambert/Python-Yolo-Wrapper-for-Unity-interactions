@@ -1,22 +1,32 @@
 import cv2
 import pytest
 from pywui.yolo import Yolo
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+TEST_IMAGE = ROOT_DIR / "docs" / "assets" / "images" / "test.jpeg"
+MODEL_WEIGHTS = ROOT_DIR / "models" / "yolov8n-pose.pt"
+
+pytestmark = pytest.mark.skipif(
+    not MODEL_WEIGHTS.exists(),
+    reason="YOLO model weights are not available in ./models/yolov8n-pose.pt",
+)
 
 
 @pytest.fixture
 def yolo():
-    return Yolo("./models/yolov8n-pose.pt")
+    return Yolo(str(MODEL_WEIGHTS))
 
 
 def test_run_detection(yolo):
-    frame = cv2.imread("./images/test.jpeg")
+    frame = cv2.imread(str(TEST_IMAGE))
     results, f = yolo.run_detection(frame)
     assert len(results) > 0
     assert f is not None
 
 
 def test_parse_results(yolo):
-    results = yolo.model(cv2.imread("./images/test.jpeg"))
+    results = yolo.model(cv2.imread(str(TEST_IMAGE)))
     peoples = yolo.parse_results(results)
     assert isinstance(peoples, list)
     assert len(peoples) > 0
@@ -31,7 +41,7 @@ def test_get_json_data(yolo):
 
 
 def test_get_peoples(yolo):
-    results = yolo.model(cv2.imread("./images/test.jpeg"))
+    results = yolo.model(cv2.imread(str(TEST_IMAGE)))
     yolo.parse_results(results)
     peoples = yolo.get_peoples()
     assert isinstance(peoples, list)

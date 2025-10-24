@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pywui"
+version = "0.1"
+description = "Use Ultralytics YOLO V8 to take the control of scene objects in Unity."
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Mathis Lambert" }
+]
+dependencies = [
+    "numpy>=1.26.4",
+    "opencv_python>=4.9.0.80",
+    "ultralytics>=8.1.35",
+    "pytest>=7.4.3",
+    "lapx>=0.5.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/mathis-lambert/Python-Yolo-Wrapper-for-Unity-interactions"
+
+[project.scripts]
+pywui = "pywui:main"
+pywui-test = "pywui:test"
+
+[tool.setuptools.packages.find]
+where = ["src"]

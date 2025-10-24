@@ -4,6 +4,7 @@
 ############################
 
 import os
+from pathlib import Path
 from torch import device
 from ultralytics import YOLO
 import json
@@ -13,8 +14,17 @@ from collections import defaultdict
 import time  # For time measurement
 from threading import Thread
 from queue import Queue
+from typing import Optional, Union
 
 os.environ['YOLO_VERBOSE'] = 'False'  # Set YOLO verbose to false
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_TRACKER = PROJECT_ROOT / "configs" / "trackers" / "botsort.yaml"
+DEFAULT_PLOTS_DIR = PROJECT_ROOT / "docs" / "assets" / "plots"
+if not DEFAULT_TRACKER.exists():
+    DEFAULT_TRACKER = Path.cwd() / "configs" / "trackers" / "botsort.yaml"
+if not DEFAULT_PLOTS_DIR.exists():
+    DEFAULT_PLOTS_DIR = Path.cwd() / "docs" / "assets" / "plots"
 
 
 class Yolo:
@@ -60,14 +70,14 @@ class Yolo:
         self.img_width = None
         self.img_height = None
 
-    def run_detection(self, frame, mode: str = "predict", tracker: str = "./trackers/botsort.yaml") -> tuple:
+    def run_detection(self, frame, mode: str = "predict", tracker: Optional[Union[str, Path]] = None) -> tuple:
         """
         Run detection on a frame and return results and a plot
 
         Args:
             frame (np.array): Frame to run detection on
             mode (str, optional): Detection mode, predict or track. Defaults to "predict".
-            tracker (str, optional): Path to the tracker file. Defaults to "./trackers/botsort.yaml".
+            tracker (str, optional): Path to the tracker file. Defaults to the project tracker config.
 
         Returns:
             tuple: Results and plot
@@ -79,8 +89,15 @@ class Yolo:
             results = self.model(
                 frame, conf=self.confidence, device=self.device, verbose=self.debug)
         elif mode == "track":
+            tracker_path = Path(tracker) if tracker else DEFAULT_TRACKER
             results = self.model.track(
-                frame, tracker=tracker, persist=True, conf=self.confidence, device=self.device, verbose=self.debug)
+                frame,
+                tracker=str(tracker_path),
+                persist=True,
+                conf=self.confidence,
+                device=self.device,
+                verbose=self.debug,
+            )
         else:
             raise Exception("Mode must be 'predict' or 'track'")
 
@@ -380,12 +397,9 @@ class Yolo:
             plt.pause(0.00001)
             pass
         elif save:
-            # check if plots directory exists
-            if not os.path.exists("./plots/"):
-                os.makedirs("./plots/")
-
+            DEFAULT_PLOTS_DIR.mkdir(parents=True, exist_ok=True)
             self.fig.tight_layout()
-            plt.savefig(f"./plots/signal_filtering.png")
+            plt.savefig(DEFAULT_PLOTS_DIR / "signal_filtering.png")
             pass
         else:
             print("Choose either real_time or save")

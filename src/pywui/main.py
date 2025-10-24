@@ -3,11 +3,17 @@
 # @Date: Janvier 2024
 ############################
 
+from pathlib import Path
 from pywui.udpsocket import updsocket as s
 import cv2
 from pywui.yolo import Yolo
 import argparse
 import platform
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_TRACKER = PROJECT_ROOT / "configs" / "trackers" / "botsort.yaml"
+if not DEFAULT_TRACKER.exists():
+    DEFAULT_TRACKER = Path.cwd() / "configs" / "trackers" / "botsort.yaml"
 
 # Parse arguments from command line
 parser = argparse.ArgumentParser()
@@ -34,8 +40,8 @@ parser.add_argument(
 parser.add_argument(
     "--tracker",
     type=str,
-    default="./trackers/botsort.yaml",
-    help="tracker path if detect method is track",
+    default=str(DEFAULT_TRACKER),
+    help="tracker configuration path when detection method is track",
 )
 parser.add_argument(
     "--confidence", type=float, default=0.5, help="confidence threshold, default is 0.5"

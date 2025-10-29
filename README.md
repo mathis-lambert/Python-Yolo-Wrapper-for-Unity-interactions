@@ -29,7 +29,7 @@ This source code has been developped to allow python and these libraries communi
 
 ⚠️ if you have a windows PC with RTX GPU and Intel CPU check the follow installation guide ⚠️
 
-- [Lien de la documentation](https://polite-comma-f85.notion.site/Installation-Windows-a91307b8e6554cc59f0c552f998a92ef?pvs=4)
+- [Lien de la documentation](https://mathis-l.notion.site/Installation-CUDA-Windows-a91307b8e6554cc59f0c552f998a92ef)
 
 Clone this public repo with wherever you want
 
